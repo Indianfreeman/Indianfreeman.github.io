@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Dashboard</title>
+	<script type="text/javascript" src="http://public.tableau.com/javascripts/api/tableau-2.0.0.min.js"></script>
+	<script type="text/javascript">
+		var viz, sheet, table,a,b;
+		var val=[];
+		function initViz() {
+				var containerDiv = document.getElementById("vizContainer"),
+            	url = "https://public.tableau.com/views/dashboard_sample/Id?:embed=y&:display_count=yes&publish=yes",
+            	options = {
+            		hideTabs: true,
+                    hideToolbar: true,
+                    onFirstInteractive: function () {
+                    workbook = viz.getWorkbook();
+      activeSheet = workbook.getActiveSheet();
+
+                	}
+            	};
+            	viz = new tableau.Viz(containerDiv, url, options);
+
+        	}
+			
+		function changeParamCust()
+ { console.log(value);
+     var value = document.getElementById("paraq").value;
+	workbook.changeParameterValueAsync('Top Customer', value)
+	.then(function() {//alert('success')// 
+	true;})
+	.otherwise(function(err) { alert('failed: ' + err);});
+}
+		function changeParamSpeed()
+ {
+ console.log(value);
+     var value = document.getElementById("speed").value;
+	workbook.changeParameterValueAsync('speed', value)
+	.then(function() {//alert('success')// 
+	true;})
+	.otherwise(function(err) { alert('failed: ' + err);});
+}   
+		function changeParamDist()
+ {
+ console.log(value);
+     var value = document.getElementById("distance").value;
+	workbook.changeParameterValueAsync('distance', value)
+	.then(function() {//alert('success')// 
+	true;})
+	.otherwise(function(err) { alert('failed: ' + err);});
+}      
+
+/* function showParams()
+{
+	workbook.getParametersAsync()
+	.then(function (params) {
+		var msg = '';
+		for(var i=0; i<params.length; i++)
+		{
+			msg += params[i].getName() + ' - ' + params[i].getDataType() + '\n';
+		}
+		alert(msg);
+	})
+}*/
+function Sheet1(){
+function switchToMapTab() {
+  workbook.activateSheetAsync("Id");
+}      
+}
+function Sheet2(){function switchToMapTab() {
+  workbook.activateSheetAsync("Analytics");
+} }     
+
+/*function querySheets() {
+  var sheets = workbook.getPublishedSheetsInfo();
+  var text = getSheetsAlertText(sheets);
+  text = "Sheets in the workbook:\n" + text;
+  alert(text);
+}*/
+</script>
+</head>
+<body onload="initViz();">
+<div class="page-header">
+		<h3>Updating Parameters of Tableau</h3>
+
+		Top Customer:
+		<input type="text" id="paraq"><br>
+		<input type="button" value="Update" onclick="changeParamCust()"><br>
+		
+		
+		<!-- <br><input type="button" value="Sheets" onclick="querySheets()"> -->
+	
+		<!-- <button id="getData" onclick="showParams()" class="btn" >Get Updates</button> -->
+		<!-- <button id="getData" onclick="changeParam(10)" class="btn" >Update Param</button> -->
+		<!--<button id="getData" onclick="speedometer()" class="btn">Show Value</button>-->
+</div>
+<div id="vizContainer"></div>
+<div id="dataTarget"></div>
+</body>
+</html>

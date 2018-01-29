@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Event Listner Example</title>
+	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+	<script type="text/javascript" src="https://public.tableau.com/javascripts/api/tableau-2.min.js"></script>
+	<script type="text/javascript">
+		var viz;
+
+		function initViz(){
+			var containerDiv = document.getElementById("vizContainer"),
+			url = "https://public.tableau.com/shared/8D8SRPMCB?:display_count=yes",
+			options = {
+            		hideTabs: true,
+                    hideToolbar: true,
+                    onFirstInteractive: function () {
+                       CategoryFilter("");
+                       listenToMarksSelection();
+                    }
+                };
+            viz = new tableau.Viz(containerDiv, url, options);
+		}
+        function listenToMarksSelection() {
+            viz.addEventListener(tableau.TableauEventName.MARKS_SELECTION, onMarksSelection);
+        }
+
+        function onMarksSelection(marksEvent) {
+        	viz.removeEventListener(tableau.TableauEventName.MARKS_SELECTION);
+            return marksEvent.getMarksAsync().then(reportSelectedMarks);
+        }
+
+        function reportSelectedMarks(marks) {
+            var html = ""; 
+            
+            for (var markIndex = 0; markIndex < marks.length; markIndex++) {
+                var pairs = marks[markIndex].getPairs();
+                html += "<b>Mark " + markIndex + ":</b><ul>";
+
+                for (var pairIndex = 0; pairIndex < pairs.length-2; pairIndex++) {
+                    var pair = pairs[pairIndex];
+                    html += "<li><b>Dimention:</b> " + pair.fieldName;
+                    html += "<br/><b>Value:</b> " + pair.formattedValue + "</li>";
+                }
+
+                html += "</ul>";
+            }
+
+            var infoDiv = document.getElementById('markDetails');
+            infoDiv.innerHTML = html;
+        }
+
+        function exportToPDF() {
+            viz.showExportPDFDialog();
+        }
+        function CategoryFilter(Category) {
+            viz.revertAllAsync();
+            var html = "";
+            var infoDiv = document.getElementById('markDetails');
+            infoDiv.innerHTML = html;
+            var sheet = viz.getWorkbook().getActiveSheet();
+            if (Category === "") {
+                sheet.clearFilterAsync("Category");
+            } else {
+                sheet.applyFilterAsync("Category", Category, tableau.FilterUpdateType.REPLACE);
+            }
+        }
+	</script>
+</head>
+<body onload="initViz();">
+	<div class="container-fluid">
+		<button class="btn-default" onclick="exportToPDF();">Export as PDF</button>
+	</div>
+	<div id="controls" style="padding:20px;">
+        Category: <select id="changeCategory" onchange="CategoryFilter(value);">
+            <option value="">All</option>
+            <option value="Furniture">Furniture</option>
+            <option value="Office Supplies">Office Supplies</option>
+            <option value="Technology">Technology</option>         
+        </select>
+    </div>
+	<div classs="container-fluid" id="vizContainer"></div>
+	<br>
+	<div classs="container-fluid" id="markDetails"></div>
+</body>
+<script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
+</html>

@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Dashboard</title>
+	<script type="text/javascript" src="https://public.tableau.com/javascripts/api/tableau-2.min.js"></script>
+	<script type="text/javascript" src="https://www.amcharts.com/lib/3/amcharts.js"></script>	
+	<script type="text/javascript" src="https://www.amcharts.com/lib/3/gauge.js"></script>	
+	<script type="text/javascript">
+		var viz, sheet, table,a,b;
+		var val=[];
+		
+		function initViz() {
+				var containerDiv = document.getElementById("vizContainer"),
+            	url = "https://public.tableau.com/views/MySampleLearning/Sheet1?:embed=y&:display_count=yes&publish=yes?",
+            	options = {
+            		hideTabs: true,
+                    hideToolbar: true,
+                    onFirstInteractive: function () {
+                    <!--document.getElementById('getData').disabled = false; // Enable our button-->
+                	}
+            	};
+            	viz = new tableau.Viz(containerDiv, url, options);
+
+        	}
+        function getUnderlyingData(){
+            	sheet = viz.getWorkbook().getActiveSheet();
+            	// If the active sheet is not a dashboard, then you can just enter:
+		 		// viz.getWorkbook().getActiveSheet();
+                options = {
+                    maxRows: 10, // Max rows to return. Use 0 to return all rows
+                    ignoreAliases: false,
+                    ignoreSelection: true,
+                    includeAllColumns: false
+                };
+
+                sheet.getUnderlyingDataAsync(options).then(function(t){
+                       table = t;
+					   var tgt = document.getElementById("dataTarget");
+					});
+				; };
+		function speedometer() {
+			var a=[];
+			a=table.getData();
+			console.log(a[0][1].value);
+			b=a[0][1].value;
+			AmCharts.makeChart("chartdiv",
+				{
+					"type": "gauge",
+					"theme": "default",
+					"arrows": [
+						{
+							"id": "GaugeArrow-1",
+							"value": b							
+						}
+					],
+					"axes": [
+						{
+							"bottomText": b + " km/h",
+							"bottomTextYOffset": -20,
+							"endValue": 26,
+							"id": "GaugeAxis-1",
+							"valueInterval": 1,
+							"bands": [
+								{
+									"color": "#00CC00",
+									"endValue": 8,
+									"id": "GaugeBand-1",
+									"startValue": 0
+								},
+								{
+									"color": "#ffac29",
+									"endValue": 16,
+									"id": "GaugeBand-2",
+									"startValue": 8
+								},
+								{
+									"color": "#ea3838",
+									"endValue": 26,
+									"id": "GaugeBand-3",
+									"innerRadius": "95%",
+									"startValue": 16
+								}
+							]
+						}
+					],
+					"allLabels": [],
+					"balloon": {},
+					"titles": [
+						{
+							"id": "Title-1",
+							"size": 15,
+							"text": "Speedometer"
+						}
+					]
+				}
+			);
+		}
+
+		function getUpdates(){
+			setInterval(getUnderlyingData,4000);
+			setInterval(speedometer,2000);
+		}
+	</script>
+</head>
+<body onload="initViz();">
+<div class="page-header">
+		<h1>Getting Data from the Tableau dashboard onto the Page</h1>
+		<button id="getData" onclick="getUpdates()" class="btn" >Get Updates</button>
+		<!--<button id="getData" onclick="speedometer()" class="btn">Show Value</button>-->
+</div>
+<div id="vizContainer"></div>
+<div id="dataTarget"></div>
+<div id="chartdiv" style="width: 100%; height: 300px; background-color: #FFFFFF;" ></div>
+</body>
+</html>
